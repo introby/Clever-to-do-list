@@ -4,17 +4,21 @@ import {
     Button,
     Checkbox,
     Heading,
+    HStack,
     Input,
-    InputGroup,
     List,
     ListItem,
     Stack,
 } from '@chakra-ui/react';
+import { SingleDatepicker } from 'chakra-dayzed-datepicker';
+import firebase from 'firebase/compat';
+import Timestamp = firebase.firestore.Timestamp;
 
-type TaskType = {
+export type TaskType = {
     id: string;
     title: string;
     isDone: boolean;
+    date: Timestamp;
 };
 
 type PropsType = {
@@ -28,6 +32,7 @@ type PropsType = {
 function Todolist(props: PropsType) {
     const { title, tasks, removeTask, changeFilter, addTask } = props;
     const [newTaskTitle, setNewTaskTitle] = useState('');
+    const [date, setDate] = useState(new Date());
 
     const onNewTitleChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
         setNewTaskTitle(e.currentTarget.value);
@@ -60,7 +65,39 @@ function Todolist(props: PropsType) {
     return (
         <Stack>
             <Heading>{title}</Heading>
-            <InputGroup size="md">
+
+            <HStack>
+                <SingleDatepicker
+                    name="date-input"
+                    date={date}
+                    onDateChange={setDate}
+                    propsConfigs={{
+                        dayOfMonthBtnProps: {
+                            defaultBtnProps: {
+                                _hover: {
+                                    background: 'blue.300',
+                                },
+                            },
+                            selectedBtnProps: {
+                                background: '#0085f230',
+                            },
+                        },
+                        dateNavBtnProps: {
+                            _hover: {
+                                background: '#0085f230',
+                            },
+                        },
+                        popoverCompProps: {
+                            popoverContentProps: {
+                                background: 'gray.700',
+                                color: 'white',
+                            },
+                        },
+                        inputProps: {
+                            width: '115px',
+                        },
+                    }}
+                />
                 <Input
                     width="auto"
                     placeholder="Task name"
@@ -69,14 +106,14 @@ function Todolist(props: PropsType) {
                     onKeyPress={onKeyPressHandler}
                 />
                 <Button onClick={addTaskHandler}>+</Button>
-            </InputGroup>
+            </HStack>
             <List spacing={3}>
                 {tasks.map((t) => {
                     const onRemoveHandler = () => removeTask(t.id);
                     return (
                         <ListItem key={t.id}>
                             <Checkbox isChecked={t.isDone}>
-                                {t.title}
+                                {t.title} + {t.id}
                                 <Button
                                     size="xs"
                                     colorScheme="blue"
