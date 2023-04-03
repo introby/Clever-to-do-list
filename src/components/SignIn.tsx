@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import Form from './Form';
-import AuthContext from './AuthContext';
+import AuthContext from './contexts/AuthContext';
 
 function SignIn() {
     const navigate = useNavigate();

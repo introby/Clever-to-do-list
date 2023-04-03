@@ -1,29 +1,56 @@
-import React, { useContext } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './Calendar.module.scss';
-import { TodoContext } from '../../pages/Home';
-import { TaskType } from '../Todolist';
+import Day from './Day';
 
 function Calendar() {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    function dateRange(steps = 1) {
+    const [activeDayIndex, setActiveDayIndex] = useState<number>();
+    const [datesRange, setDatesRange] = useState<Date[]>([]);
+    const [nextRange, setNextRange] = useState(1);
+
+    function generateDatesRange(page: number, steps = 1) {
         const dateArray = [];
-        const minus = new Date(new Date().setDate(new Date().getDate() - 10));
-        const plus = new Date(new Date().setDate(new Date().getDate() + 10));
+        const minus = new Date(new Date().setDate(new Date().getDate() - 14));
+        const plus = new Date(
+            new Date().setDate(new Date().getDate() + 14 * page)
+        );
 
         while (minus <= plus) {
             dateArray.push(new Date(minus));
             minus.setUTCDate(minus.getUTCDate() + steps);
         }
-
-        return dateArray;
+        setDatesRange(dateArray);
     }
 
-    const dates = dateRange();
+    useEffect(() => {
+        generateDatesRange(nextRange);
+    }, [nextRange]);
 
-    const { setDay, tasks } = useContext(TodoContext);
+    const todayRef = useRef<null | HTMLDivElement>(null);
+    useEffect(() => {
+        if (todayRef.current) {
+            todayRef.current.scrollIntoView({
+                behavior: 'smooth',
+                inline: 'center',
+            });
+        }
+    });
 
-    const dayClick = (date: Date) => {
-        setDay(date);
+    const intObserver = useRef<IntersectionObserver | null>();
+
+    const lastDayRef = useCallback((date: Element) => {
+        if (intObserver.current) intObserver.current.disconnect();
+
+        intObserver.current = new IntersectionObserver((dates) => {
+            if (dates[0].isIntersecting) {
+                setNextRange((prevState) => prevState + 1);
+            }
+        });
+
+        if (date) intObserver.current.observe(date);
+    }, []);
+
+    const onClickDay = (index: number) => {
+        setActiveDayIndex(index);
     };
 
     function isToday(dateParameter: Date) {
@@ -35,45 +62,30 @@ function Calendar() {
         );
     }
 
-    const taskMap = () => {
-        // TODO смапить таски по дате и проверять, если ли в этот день таски
-        const tasks2 = [
-            { key: 'key1', val: 'val1' },
-            { key: 'key2', val: 'val2' },
-            { key: 'key3', val: 'val3' },
-            { key: 'key3', val: 'val4' },
-        ];
-        const result = new Map();
-        tasks2.map((task2) => {
-            const items = result.get(task2.key);
-            let newList: string[] = [];
-            if (items) {
-                newList = [].concat(items);
-            }
-            newList.push(task2.val);
-            result.set(task2.key, newList);
-        });
-
-        return result;
-    };
+    function getRef(date: Date, i: number) {
+        let resultRef;
+        if (isToday(date)) {
+            resultRef = todayRef;
+        }
+        if (datesRange.length === i + 1) {
+            resultRef = lastDayRef;
+        }
+        return resultRef;
+    }
 
     return (
         <div className={styles.container}>
             <ul className={styles.stripe}>
-                {dates.map((date) => {
+                {datesRange.map((date, i) => {
                     return (
-                        <li
+                        <Day
+                            ref={getRef(date, i)}
                             key={date.toString()}
-                            onClick={() => dayClick(date)}
-                            className={isToday(date) ? 'today' : undefined}
-                        >
-                            <ul>
-                                <li>{days[date.getDay()]}</li>
-                                <li>{date.getDate()}</li>
-                                {/* // TODO здесь метка, есть ли таски в этот день */}
-                                <li>{taskMap().size}</li>
-                            </ul>
-                        </li>
+                            isActive={activeDayIndex === i}
+                            date={date}
+                            onDayChange={() => onClickDay(i)}
+                            isToday={isToday(date)}
+                        />
                     );
                 })}
             </ul>
