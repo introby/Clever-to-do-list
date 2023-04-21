@@ -1,21 +1,30 @@
-import { HashRouter, Route, Routes } from 'react-router-dom';
-import Home from './pages/Home';
-import NotFound from './pages/NotFound';
+import { BrowserRouter } from 'react-router-dom';
+import { ChakraProvider } from '@chakra-ui/react';
+import { useMemo, useState } from 'react';
+import AuthContext from './components/contexts/AuthContext';
+import AppRoutes from './components/AppRoutes';
 
 function App() {
-    return (
-        <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="*" element={<NotFound />} />
-        </Routes>
-    );
+    return <AppRoutes />;
 }
 
 function WrappedApp() {
+    const [email, setEmail] = useState('');
+    const [token, setToken] = useState('');
+
+    const authContextProviderValue = useMemo(
+        () => ({ email, setEmail, token, setToken }),
+        [email, setEmail, token, setToken]
+    );
+
     return (
-        <HashRouter>
-            <App />
-        </HashRouter>
+        <BrowserRouter>
+            <ChakraProvider>
+                <AuthContext.Provider value={authContextProviderValue}>
+                    <App />
+                </AuthContext.Provider>
+            </ChakraProvider>
+        </BrowserRouter>
     );
 }
 

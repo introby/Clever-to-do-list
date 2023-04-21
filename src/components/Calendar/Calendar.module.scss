@@ -1,0 +1,29 @@
+.container {
+  width: 576px;
+  overflow-x: scroll;
+  padding: 2px;
+}
+
+li {
+  list-style-type: none;
+  cursor: pointer;
+}
+
+.stripe {
+  display: inline-flex;
+
+  .today {
+    background-color: #00b2ff;
+    color: white;
+  }
+
+  .active {
+    background-color: #7ce2d5;
+    color: white;
+  }
+
+  li {
+    text-align: center;
+    width: 40px;
+  }
+}

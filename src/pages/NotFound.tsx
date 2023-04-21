@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
+import { Heading } from '@chakra-ui/react';
+import React from 'react';
 
 function NotFound() {
     return (
         <>
-            <h1>Not Found</h1>
+            <Heading>Not Found</Heading>
             <Link to="/">GO HOME</Link>
         </>
     );
