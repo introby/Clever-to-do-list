@@ -13,9 +13,11 @@ import {
 import firebase from 'firebase/compat';
 import TaskModal from './TaskModal';
 import Timestamp = firebase.firestore.Timestamp;
+import useAuth from '../hooks/useAuth';
 
 export type TaskType = {
     id: string;
+    email: string;
     title: string;
     isDone: boolean;
     date: Timestamp;
@@ -48,6 +50,7 @@ function Todolist(props: PropsType) {
     const [date, setDate] = useState(new Date());
     const [showModal, setShowModal] = useState(false);
     const [isNewTask, setIsNewTask] = useState(true);
+    const { email } = useAuth();
 
     const onNewTitleChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
         setTaskTitle(e.currentTarget.value);
@@ -73,12 +76,14 @@ function Todolist(props: PropsType) {
         } else {
             editTask({
                 id: taskId,
+                email,
                 title: taskTitle,
                 isDone: false,
                 date: Timestamp.fromDate(date),
                 description: taskDescription,
             });
         }
+        setShowModal(false);
     };
 
     const onAllClickHandler = () => {
@@ -146,9 +151,7 @@ function Todolist(props: PropsType) {
                                     isChecked={t.isDone}
                                     onChange={onCheckBoxChangeHandler}
                                 />
-                                <Text onClick={() => setShowModal(true)}>
-                                    {t.title}
-                                </Text>
+                                <Text onClick={onEditHandler}>{t.title}</Text>
                                 <Button
                                     size="xs"
                                     colorScheme="blue"

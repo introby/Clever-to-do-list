@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { v1 } from 'uuid';
-import { Button, HStack, Stack, WrapItem } from '@chakra-ui/react';
+import { Button, HStack, Stack, useToast, WrapItem } from '@chakra-ui/react';
 import firebase from 'firebase/compat';
 import { QueryDocumentSnapshot } from 'firebase/firestore';
 import useAuth from '../hooks/useAuth';
@@ -25,11 +25,13 @@ function Home() {
     const [filter, setFilter] = useState<FilterValuesType>('all');
     const { setEmail, setToken } = useContext(AuthContext);
     const [day, setDay] = useState(new Date());
+    const toast = useToast();
 
     useEffect(() => {
-        const unsubscribe = unsubscribeFunction((snapshot) => {
+        const unsubscribe = unsubscribeFunction(email, (snapshot) => {
             setTasks(
                 snapshot.docs.map((document: QueryDocumentSnapshot) => ({
+                    email: document.data().email,
                     title: document.data().title,
                     isDone: document.data().isDone,
                     id: document.id,
@@ -39,25 +41,31 @@ function Home() {
             );
         });
         return () => unsubscribe();
-    }, [day]);
+    }, [day, email]);
 
     const editTask = (task: TaskType) => {
         updateTask(task.id, task)
-            .then(() => {
-                console.log('edited');
-            })
-            .catch((error) => {
-                console.log(error);
+            .then(() => {})
+            .catch(() => {
+                toast({
+                    title: 'Error when editing the task',
+                    isClosable: true,
+                    duration: 5000,
+                    status: 'error',
+                });
             });
     };
 
     const removeTask = (id: string) => {
         deleteTaskFromDB(id)
-            .then(() => {
-                console.log('deleted');
-            })
-            .catch((error) => {
-                console.log(error);
+            .then(() => {})
+            .catch(() => {
+                toast({
+                    title: 'Error when deleting the task',
+                    isClosable: true,
+                    duration: 5000,
+                    status: 'error',
+                });
             });
     };
 
@@ -65,17 +73,21 @@ function Home() {
         const editedTask = { ...task };
         editedTask.isDone = !task.isDone;
         updateTask(task.id, editedTask)
-            .then(() => {
-                console.log('edited');
-            })
-            .catch((error) => {
-                console.log(error);
+            .then(() => {})
+            .catch(() => {
+                toast({
+                    title: 'Error when editing the task',
+                    isClosable: true,
+                    duration: 5000,
+                    status: 'error',
+                });
             });
     };
 
     const addTask = (newTitle: string, date: Date, description: string) => {
         const newTask: TaskType = {
             id: v1(),
+            email,
             title: newTitle,
             isDone: false,
             date: Timestamp.fromDate(date),
@@ -83,11 +95,14 @@ function Home() {
         };
 
         addTaskToDB(newTask.id, newTask)
-            .then((response) => {
-                console.log(response);
-            })
-            .catch((error) => {
-                console.log(error);
+            .then(() => {})
+            .catch(() => {
+                toast({
+                    title: 'Error when creating the task',
+                    isClosable: true,
+                    duration: 5000,
+                    status: 'error',
+                });
             });
     };
 

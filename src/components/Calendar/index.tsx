@@ -6,6 +6,7 @@ function Calendar() {
     const [activeDayIndex, setActiveDayIndex] = useState<number>();
     const [datesRange, setDatesRange] = useState<Date[]>([]);
     const [nextRange, setNextRange] = useState(1);
+    const [needScroll, setNeedScroll] = useState(true);
 
     function generateDatesRange(page: number, steps = 1) {
         const dateArray = [];
@@ -27,7 +28,7 @@ function Calendar() {
 
     const todayRef = useRef<null | HTMLDivElement>(null);
     useEffect(() => {
-        if (todayRef.current) {
+        if (todayRef.current && needScroll) {
             todayRef.current.scrollIntoView({
                 behavior: 'smooth',
                 inline: 'center',
@@ -42,6 +43,7 @@ function Calendar() {
 
         intObserver.current = new IntersectionObserver((dates) => {
             if (dates[0].isIntersecting) {
+                setNeedScroll(false);
                 setNextRange((prevState) => prevState + 1);
             }
         });
@@ -50,6 +52,7 @@ function Calendar() {
     }, []);
 
     const onClickDay = (index: number) => {
+        setNeedScroll(false);
         setActiveDayIndex(index);
     };
 

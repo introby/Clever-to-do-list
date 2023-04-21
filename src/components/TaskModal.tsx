@@ -91,6 +91,7 @@ function TaskModal({
                         />
                     </HStack>
                     <Textarea
+                        value={description}
                         mt={5}
                         placeholder="Description"
                         onChange={onChangeDescription}
