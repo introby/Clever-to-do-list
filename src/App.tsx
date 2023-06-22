@@ -5,10 +5,6 @@ import AuthContext from './components/contexts/AuthContext';
 import AppRoutes from './components/AppRoutes';
 
 function App() {
-    return <AppRoutes />;
-}
-
-function WrappedApp() {
     const [email, setEmail] = useState('');
     const [token, setToken] = useState('');
 
@@ -21,11 +17,11 @@ function WrappedApp() {
         <BrowserRouter>
             <ChakraProvider>
                 <AuthContext.Provider value={authContextProviderValue}>
-                    <App />
+                    <AppRoutes />
                 </AuthContext.Provider>
             </ChakraProvider>
         </BrowserRouter>
     );
 }
 
-export default WrappedApp;
+export default App;

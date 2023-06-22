@@ -1,28 +1,12 @@
 import { FilterValuesType } from 'pages/Home';
 import { ChangeEvent, KeyboardEvent, useState } from 'react';
-import {
-    Button,
-    Checkbox,
-    Heading,
-    HStack,
-    List,
-    ListItem,
-    Stack,
-    Text,
-} from '@chakra-ui/react';
+import { Button, Heading, HStack, List, Stack } from '@chakra-ui/react';
 import firebase from 'firebase/compat';
 import TaskModal from './TaskModal';
 import Timestamp = firebase.firestore.Timestamp;
 import useAuth from '../hooks/useAuth';
-
-export type TaskType = {
-    id: string;
-    email: string;
-    title: string;
-    isDone: boolean;
-    date: Timestamp;
-    description: string;
-};
+import Todo from './Todo';
+import TaskType from './TaskType';
 
 type PropsType = {
     title: string;
@@ -140,34 +124,18 @@ function Todolist(props: PropsType) {
                 onClickSave={saveTaskHandler}
             />
             <List spacing={3}>
-                {tasks.map((t) => {
-                    const onEditHandler = () => editTaskHandler(t);
-                    const onRemoveHandler = () => removeTask(t.id);
-                    const onCheckBoxChangeHandler = () => changeCheckBox(t);
+                {tasks.map((task) => {
+                    const onEditHandler = () => editTaskHandler(task);
+                    const onRemoveHandler = () => removeTask(task.id);
+                    const onCheckBoxChangeHandler = () => changeCheckBox(task);
                     return (
-                        <ListItem key={t.id}>
-                            <HStack>
-                                <Checkbox
-                                    isChecked={t.isDone}
-                                    onChange={onCheckBoxChangeHandler}
-                                />
-                                <Text onClick={onEditHandler}>{t.title}</Text>
-                                <Button
-                                    size="xs"
-                                    colorScheme="blue"
-                                    onClick={onEditHandler}
-                                >
-                                    ...
-                                </Button>
-                                <Button
-                                    size="xs"
-                                    colorScheme="blue"
-                                    onClick={onRemoveHandler}
-                                >
-                                    x
-                                </Button>
-                            </HStack>
-                        </ListItem>
+                        <Todo
+                            key={task.id}
+                            task={task}
+                            onChange={onCheckBoxChangeHandler}
+                            onClickEdit={onEditHandler}
+                            onClickDelete={onRemoveHandler}
+                        />
                     );
                 })}
             </List>

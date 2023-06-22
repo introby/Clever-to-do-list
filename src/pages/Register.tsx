@@ -5,10 +5,10 @@ import SignUp from '../components/SignUp';
 
 function Register() {
     return (
-        <Stack padding="5px 2rem">
-            <Heading>Register</Heading>
+        <Stack mx="auto" width="400px" padding="5px 2rem">
+            <Heading textAlign="center">Register</Heading>
             <SignUp />
-            <Text>
+            <Text align="left">
                 Already have an account?
                 <Link
                     as={RouterLink}

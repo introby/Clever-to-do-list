@@ -4,8 +4,7 @@ import { v1 } from 'uuid';
 import { Button, HStack, Stack, useToast, WrapItem } from '@chakra-ui/react';
 import firebase from 'firebase/compat';
 import { QueryDocumentSnapshot } from 'firebase/firestore';
-import useAuth from '../hooks/useAuth';
-import Todolist, { TaskType } from '../components/Todolist';
+import Todolist from '../components/Todolist';
 import {
     addTaskToDB,
     deleteTaskFromDB,
@@ -16,14 +15,14 @@ import AuthContext from '../components/contexts/AuthContext';
 import TodoContext from '../components/contexts/TodoContext';
 import Calendar from '../components/Calendar';
 import Timestamp = firebase.firestore.Timestamp;
+import TaskType from '../components/TaskType';
 
 export type FilterValuesType = 'all' | 'active' | 'completed';
 
 function Home() {
-    const { isAuth, email } = useAuth();
     const [tasks, setTasks] = useState<TaskType[]>([]);
     const [filter, setFilter] = useState<FilterValuesType>('all');
-    const { setEmail, setToken } = useContext(AuthContext);
+    const { email, setEmail, setToken } = useContext(AuthContext);
     const [day, setDay] = useState(new Date());
     const toast = useToast();
 
@@ -57,31 +56,27 @@ function Home() {
     };
 
     const removeTask = (id: string) => {
-        deleteTaskFromDB(id)
-            .then(() => {})
-            .catch(() => {
-                toast({
-                    title: 'Error when deleting the task',
-                    isClosable: true,
-                    duration: 5000,
-                    status: 'error',
-                });
+        deleteTaskFromDB(id).catch(() => {
+            toast({
+                title: 'Error when deleting the task',
+                isClosable: true,
+                duration: 5000,
+                status: 'error',
             });
+        });
     };
 
     const changeCheckBox = (task: TaskType) => {
         const editedTask = { ...task };
         editedTask.isDone = !task.isDone;
-        updateTask(task.id, editedTask)
-            .then(() => {})
-            .catch(() => {
-                toast({
-                    title: 'Error when editing the task',
-                    isClosable: true,
-                    duration: 5000,
-                    status: 'error',
-                });
+        updateTask(task.id, editedTask).catch(() => {
+            toast({
+                title: 'Error when editing the task',
+                isClosable: true,
+                duration: 5000,
+                status: 'error',
             });
+        });
     };
 
     const addTask = (newTitle: string, date: Date, description: string) => {
@@ -130,12 +125,12 @@ function Home() {
         [day, setDay, tasks]
     );
 
-    return isAuth ? (
+    return email ? (
         <HStack
             padding="5px 2rem"
             spacing={5}
             align="top"
-            justifyContent="space-between"
+            justifyContent="center"
         >
             <Stack>
                 <TodoContext.Provider value={todoContextProviderValue}>

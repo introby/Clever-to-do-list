@@ -22,9 +22,9 @@ function Calendar() {
         setDatesRange(dateArray);
     }
 
-    useEffect(() => {
-        generateDatesRange(nextRange);
-    }, [nextRange]);
+    const generateDates = useCallback(generateDatesRange, []);
+
+    useEffect(() => generateDates(nextRange), [generateDates, nextRange]);
 
     const todayRef = useRef<null | HTMLDivElement>(null);
     useEffect(() => {

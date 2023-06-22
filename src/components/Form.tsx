@@ -54,6 +54,7 @@ function Form({ title, handleClick }: FormProps): JSX.Element {
     return (
         <form onSubmit={handleSubmit}>
             <Stack
+                // width="400px"
                 spacing="2"
                 p="3"
                 bg="gray.200"
